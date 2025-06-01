@@ -81,29 +81,34 @@ echo %INSTALL_DATE% - Initializing database >> "%LOGS_PATH%\install.log"
 set DB_FILE=%DATA_PATH%\restaurant.db
 set DB_BACKUP=%BACKUPS_PATH%\restaurant_initial.db
 
+:: Create SQL initialization script - only create tables, no data
+echo CREATE TABLE IF NOT EXISTS Categories (CategoryId INTEGER PRIMARY KEY, Name TEXT NOT NULL, Description TEXT); > "%TEMP%\create_tables.sql"
+echo CREATE TABLE IF NOT EXISTS Products (ProductId INTEGER PRIMARY KEY, Name TEXT NOT NULL, Description TEXT, Price REAL NOT NULL, CategoryId INTEGER, IsAvailable INTEGER, Image TEXT, FOREIGN KEY(CategoryId) REFERENCES Categories(CategoryId)); >> "%TEMP%\create_tables.sql"
+echo CREATE TABLE IF NOT EXISTS Orders (OrderId INTEGER PRIMARY KEY, OrderDate TEXT NOT NULL, CustomerName TEXT, TotalAmount REAL, IsPaid INTEGER, PaymentMethod TEXT, OrderStatus TEXT); >> "%TEMP%\create_tables.sql"
+echo CREATE TABLE IF NOT EXISTS OrderItems (OrderItemId INTEGER PRIMARY KEY, OrderId INTEGER, ProductId INTEGER, Quantity INTEGER, Subtotal REAL, FOREIGN KEY(OrderId) REFERENCES Orders(OrderId), FOREIGN KEY(ProductId) REFERENCES Products(ProductId)); >> "%TEMP%\create_tables.sql"
+echo CREATE TABLE IF NOT EXISTS Users (UserId INTEGER PRIMARY KEY, Username TEXT NOT NULL UNIQUE, PasswordHash TEXT NOT NULL, FullName TEXT, Role TEXT, IsActive INTEGER); >> "%TEMP%\create_tables.sql"
+echo CREATE TABLE IF NOT EXISTS AppSettings (SettingId INTEGER PRIMARY KEY, SettingKey TEXT NOT NULL UNIQUE, SettingValue TEXT, Description TEXT); >> "%TEMP%\create_tables.sql"
+
+:: Create SQL script for data insertion
+echo BEGIN TRANSACTION; > "%TEMP%\insert_data.sql"
+echo INSERT OR IGNORE INTO Categories (CategoryId, Name, Description) VALUES (1, 'Main Dishes', 'Primary dishes'); >> "%TEMP%\insert_data.sql"
+echo INSERT OR IGNORE INTO Categories (CategoryId, Name, Description) VALUES (2, 'Beverages', 'Hot and cold drinks'); >> "%TEMP%\insert_data.sql"
+echo INSERT OR IGNORE INTO Products (ProductId, Name, Description, Price, CategoryId, IsAvailable) VALUES (1, 'Beef Burger', 'Beef burger with cheese and vegetables', 25.00, 1, 1); >> "%TEMP%\insert_data.sql"
+echo INSERT OR IGNORE INTO Users (UserId, Username, PasswordHash, FullName, Role, IsActive) VALUES (1, 'admin', '$2a$11$K3g6XpVzmdBp0AfZ9GWbZeRJJWrm/QbiQTfHX5XhwJECZ6FbLIHSa', 'System Administrator', 'Admin', 1); >> "%TEMP%\insert_data.sql"
+echo COMMIT; >> "%TEMP%\insert_data.sql"
+
 if not exist "%DB_FILE%" (
     echo [i] Creating new database...
-    
-    :: Create SQL initialization script
-    echo BEGIN TRANSACTION; > "%TEMP%\init_db.sql"
-    echo CREATE TABLE IF NOT EXISTS Categories (CategoryId INTEGER PRIMARY KEY, Name TEXT NOT NULL, Description TEXT); >> "%TEMP%\init_db.sql"
-    echo CREATE TABLE IF NOT EXISTS Products (ProductId INTEGER PRIMARY KEY, Name TEXT NOT NULL, Description TEXT, Price REAL NOT NULL, CategoryId INTEGER, IsAvailable INTEGER, Image TEXT, FOREIGN KEY(CategoryId) REFERENCES Categories(CategoryId)); >> "%TEMP%\init_db.sql"
-    echo CREATE TABLE IF NOT EXISTS Orders (OrderId INTEGER PRIMARY KEY, OrderDate TEXT NOT NULL, CustomerName TEXT, TotalAmount REAL, IsPaid INTEGER, PaymentMethod TEXT, OrderStatus TEXT); >> "%TEMP%\init_db.sql"
-    echo CREATE TABLE IF NOT EXISTS OrderItems (OrderItemId INTEGER PRIMARY KEY, OrderId INTEGER, ProductId INTEGER, Quantity INTEGER, Subtotal REAL, FOREIGN KEY(OrderId) REFERENCES Orders(OrderId), FOREIGN KEY(ProductId) REFERENCES Products(ProductId)); >> "%TEMP%\init_db.sql"
-    echo CREATE TABLE IF NOT EXISTS Users (UserId INTEGER PRIMARY KEY, Username TEXT NOT NULL UNIQUE, PasswordHash TEXT NOT NULL, FullName TEXT, Role TEXT, IsActive INTEGER); >> "%TEMP%\init_db.sql"
-    echo CREATE TABLE IF NOT EXISTS AppSettings (SettingId INTEGER PRIMARY KEY, SettingKey TEXT NOT NULL UNIQUE, SettingValue TEXT, Description TEXT); >> "%TEMP%\init_db.sql"
-    
-    :: Add initial data with secure password hash
-    echo INSERT OR IGNORE INTO Categories (CategoryId, Name, Description) VALUES (1, 'Main Dishes', 'Primary dishes'); >> "%TEMP%\init_db.sql"
-    echo INSERT OR IGNORE INTO Categories (CategoryId, Name, Description) VALUES (2, 'Beverages', 'Hot and cold drinks'); >> "%TEMP%\init_db.sql"
-    echo INSERT OR IGNORE INTO Products (ProductId, Name, Description, Price, CategoryId, IsAvailable) VALUES (1, 'Beef Burger', 'Beef burger with cheese and vegetables', 25.00, 1, 1); >> "%TEMP%\init_db.sql"
-    echo INSERT OR IGNORE INTO Users (UserId, Username, PasswordHash, FullName, Role, IsActive) VALUES (1, 'admin', '$2a$11$K3g6XpVzmdBp0AfZ9GWbZeRJJWrm/QbiQTfHX5XhwJECZ6FbLIHSa', 'System Administrator', 'Admin', 1); >> "%TEMP%\init_db.sql"
-    echo COMMIT; >> "%TEMP%\init_db.sql"
     
     :: Try to create database if SQLite exists
     if exist "%SQLITE_EXE%" (
         echo [i] Creating database with SQLite...
-        "%SQLITE_EXE%" "%DB_FILE%" < "%TEMP%\init_db.sql"
+        
+        :: First create tables
+        "%SQLITE_EXE%" "%DB_FILE%" < "%TEMP%\create_tables.sql"
+        
+        :: Then insert data
+        "%SQLITE_EXE%" "%DB_FILE%" < "%TEMP%\insert_data.sql"
         
         if exist "%DB_FILE%" (
             copy "%DB_FILE%" "%DB_BACKUP%" >nul
@@ -123,6 +128,13 @@ if not exist "%DB_FILE%" (
 ) else (
     echo [✓] Database already exists
     echo %INSTALL_DATE% - Database already exists >> "%LOGS_PATH%\install.log"
+    
+    :: Update existing database schema
+    if exist "%SQLITE_EXE%" (
+        echo [i] Updating database schema...
+        "%SQLITE_EXE%" "%DB_FILE%" < "%TEMP%\create_tables.sql"
+        echo [✓] Database schema updated
+    )
 )
 
 :: Step 5: Create desktop shortcut
@@ -144,7 +156,8 @@ echo %INSTALL_DATE% - Desktop shortcut created >> "%LOGS_PATH%\install.log"
 
 :: Cleanup
 echo [i] Cleaning up temporary files...
-del "%TEMP%\init_db.sql" >nul 2>&1
+del "%TEMP%\create_tables.sql" >nul 2>&1
+del "%TEMP%\insert_data.sql" >nul 2>&1
 del "%TEMP%\CreateShortcut.vbs" >nul 2>&1
 
 :: Final message
