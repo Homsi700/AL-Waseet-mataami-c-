@@ -137,10 +137,43 @@ if not exist "%DB_FILE%" (
     )
 )
 
-:: Step 5: Create desktop shortcut
-echo [5/5] Creating desktop shortcut...
+:: Step 5: Copy executable files (if available) or create placeholder
+echo [5/5] Setting up application files...
+
+:: Check if we have executable in the current directory
+set SOURCE_DIR=%~dp0
+set SOURCE_EXE=%SOURCE_DIR%%APP_NAME%.exe
+
+if exist "%SOURCE_EXE%" (
+    echo [i] Found executable file, copying to installation directory...
+    copy "%SOURCE_EXE%" "%APP_PATH%\" >nul
+    echo [✓] Application files copied
+    echo %INSTALL_DATE% - Application files copied >> "%LOGS_PATH%\install.log"
+) else (
+    echo [i] Executable not found, creating placeholder...
+    echo @echo off > "%APP_PATH%\%APP_NAME%.bat"
+    echo echo ================================================ >> "%APP_PATH%\%APP_NAME%.bat"
+    echo echo    Restaurant Management System v%APP_VERSION% >> "%APP_PATH%\%APP_NAME%.bat"
+    echo echo ================================================ >> "%APP_PATH%\%APP_NAME%.bat"
+    echo echo. >> "%APP_PATH%\%APP_NAME%.bat"
+    echo echo This is a placeholder for the actual application. >> "%APP_PATH%\%APP_NAME%.bat"
+    echo echo The application needs to be built from source code. >> "%APP_PATH%\%APP_NAME%.bat"
+    echo echo. >> "%APP_PATH%\%APP_NAME%.bat"
+    echo echo Please build the project in Visual Studio and copy >> "%APP_PATH%\%APP_NAME%.bat"
+    echo echo the executable files to this directory. >> "%APP_PATH%\%APP_NAME%.bat"
+    echo echo. >> "%APP_PATH%\%APP_NAME%.bat"
+    echo pause >> "%APP_PATH%\%APP_NAME%.bat"
+    
+    echo [i] Created placeholder batch file
+    echo %INSTALL_DATE% - Created placeholder batch file >> "%LOGS_PATH%\install.log"
+    
+    :: Set target to batch file instead
+    set TARGET_PATH=%APP_PATH%\%APP_NAME%.bat
+)
+
+:: Create desktop shortcut
+echo [i] Creating desktop shortcut...
 set SHORTCUT_PATH=%USERPROFILE%\Desktop\%APP_NAME%.lnk
-set TARGET_PATH=%APP_PATH%\%APP_NAME%.exe
 
 echo Set oWS = WScript.CreateObject("WScript.Shell") > "%TEMP%\CreateShortcut.vbs"
 echo sLinkFile = "%SHORTCUT_PATH%" >> "%TEMP%\CreateShortcut.vbs"
