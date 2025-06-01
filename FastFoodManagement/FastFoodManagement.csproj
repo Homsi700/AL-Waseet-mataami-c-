@@ -13,8 +13,6 @@
     <None Remove="install_simple.bat" />
   </ItemGroup>
 
-  <!-- Temporarily remove package references to allow building without NuGet -->
-  <!--
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">
@@ -22,6 +20,5 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  -->
 
 </Project>
