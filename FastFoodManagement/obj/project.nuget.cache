@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "5f5Wn46fIds=",
+  "success": false,
+  "projectFilePath": "C:\\test\\AL-Waseet-mataami-c#\\FastFoodManagement\\FastFoodManagement.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Unable to load the service index for source https://api.nuget.org/v3/index.json.",
+      "libraryId": "Microsoft.EntityFrameworkCore.Sqlite"
+    }
+  ]
+}
