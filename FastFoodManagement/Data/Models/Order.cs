@@ -34,29 +34,4 @@ namespace FastFoodManagement.Data.Models
         // Navigation property
         public virtual ICollection<OrderItem> OrderItems { get; set; }
     }
-
-    public class OrderItem
-    {
-        [Key]
-        public int OrderItemId { get; set; }
-
-        public int OrderId { get; set; }
-
-        public int ProductId { get; set; }
-
-        public int Quantity { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal UnitPrice { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Subtotal { get; set; }
-
-        // Navigation properties
-        [ForeignKey("OrderId")]
-        public virtual Order Order { get; set; }
-
-        [ForeignKey("ProductId")]
-        public virtual Product Product { get; set; }
-    }
 }
