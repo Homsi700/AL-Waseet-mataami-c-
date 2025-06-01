@@ -39,8 +39,25 @@
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
                         <TextBox x:Name="txtSearch" Width="200" Margin="0,0,10,0" 
                                  Padding="5" TextChanged="txtSearch_TextChanged"
-                                 VerticalContentAlignment="Center"
-                                 PlaceholderText="Search categories..."/>
+                                 VerticalContentAlignment="Center">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                    <Style.Triggers>
+                                        <Trigger Property="Text" Value="">
+                                            <Setter Property="Background">
+                                                <Setter.Value>
+                                                    <VisualBrush Stretch="None" AlignmentX="Left">
+                                                        <VisualBrush.Visual>
+                                                            <TextBlock Text="Search categories..." Foreground="Gray" Margin="5,0,0,0"/>
+                                                        </VisualBrush.Visual>
+                                                    </VisualBrush>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
                         <Button x:Name="btnRefresh" Content="🔄 Refresh" Padding="10,5"
                                 Click="btnRefresh_Click"/>
                     </StackPanel>
