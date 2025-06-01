@@ -6,10 +6,15 @@
   "expectedPackageFiles": [],
   "logs": [
     {
+      "code": "Undefined",
+      "level": "Error",
+      "message": "Failed to download package 'SQLitePCLRaw.provider.e_sqlite3.2.1.6' from 'https://api.nuget.org/v3-flatcontainer/sqlitepclraw.provider.e_sqlite3/2.1.6/sqlitepclraw.provider.e_sqlite3.2.1.6.nupkg'.\r\nThe SSL connection could not be established, see inner exception.\r\n  Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host..\r\n  An existing connection was forcibly closed by the remote host."
+    },
+    {
       "code": "NU1301",
       "level": "Error",
-      "message": "Unable to load the service index for source https://api.nuget.org/v3/index.json.",
-      "libraryId": "Microsoft.EntityFrameworkCore.Sqlite"
+      "message": "Failed to retrieve information about 'SQLitePCLRaw.provider.e_sqlite3' from remote source 'https://api.nuget.org/v3-flatcontainer/sqlitepclraw.provider.e_sqlite3/index.json'.",
+      "libraryId": "SQLitePCLRaw.provider.e_sqlite3"
     }
   ]
 }
