@@ -1,0 +1,84 @@
+<Window x:Class="FastFoodManagement.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FastFoodManagement.Views"
+        mc:Ignorable="d"
+        Title="Fast Food Management System" Height="768" Width="1024"
+        WindowStartupLocation="CenterScreen">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#FF4500" Padding="10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" Text="Fast Food Management" 
+                           FontSize="24" FontWeight="Bold" Foreground="White"/>
+                
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <TextBlock x:Name="txtDateTime" Foreground="White" 
+                               VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <Button x:Name="btnSettings" Content="⚙️" Width="40" Height="40"
+                            Background="Transparent" Foreground="White" 
+                            BorderThickness="0" Click="btnSettings_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Navigation Menu -->
+            <Border Grid.Column="0" Background="#333333">
+                <StackPanel>
+                    <Button x:Name="btnPOS" Content="POS" Height="60" 
+                            Background="Transparent" Foreground="White"
+                            BorderThickness="0" Click="btnPOS_Click"/>
+                    
+                    <Button x:Name="btnProducts" Content="Products" Height="60" 
+                            Background="Transparent" Foreground="White"
+                            BorderThickness="0" Click="btnProducts_Click"/>
+                    
+                    <Button x:Name="btnCategories" Content="Categories" Height="60" 
+                            Background="Transparent" Foreground="White"
+                            BorderThickness="0" Click="btnCategories_Click"/>
+                    
+                    <Button x:Name="btnOrders" Content="Orders" Height="60" 
+                            Background="Transparent" Foreground="White"
+                            BorderThickness="0" Click="btnOrders_Click"/>
+                    
+                    <Button x:Name="btnReports" Content="Reports" Height="60" 
+                            Background="Transparent" Foreground="White"
+                            BorderThickness="0" Click="btnReports_Click"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Content Area -->
+            <Border Grid.Column="1" Background="WhiteSmoke">
+                <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
+            </Border>
+        </Grid>
+        
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="#333333" Padding="10">
+            <TextBlock Text="© 2025 Fast Food Management System" 
+                       Foreground="White" HorizontalAlignment="Center"/>
+        </Border>
+    </Grid>
+</Window>

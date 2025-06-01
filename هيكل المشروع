@@ -1,0 +1,17 @@
+FastFoodManagement/
+├── Data/
+│   ├── DatabaseContext.cs    // إدارة الاتصال بقاعدة البيانات
+│   └── Models/              // نماذج البيانات
+│       ├── Product.cs
+│       ├── Order.cs
+│       └── Category.cs
+├── Services/
+│   ├── PrintService.cs      // خدمة الطباعة
+│   └── DataService.cs       // خدمة البيانات
+├── Views/
+│   ├── MainWindow.xaml      // الواجهة الرئيسية
+│   ├── MainWindow.xaml.cs
+│   ├── CategoriesView.xaml  // إدارة الأصناف
+│   └── ReportsView.xaml     // التقارير
+├── App.xaml                 // إعدادات التطبيق
+└── app.config               // تكوين التطبيق
