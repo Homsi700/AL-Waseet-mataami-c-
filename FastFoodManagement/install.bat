@@ -1,26 +1,42 @@
 @echo off
+:: ================================================
 :: Restaurant Management System Installation Script
 :: Must be run as Administrator
-:: Update Date: 2024-05-15
-:: Version: 2.0 - Updated for .NET 8.0 with additional improvements
+:: Version: 3.0 (Enhanced with all suggested improvements)
+:: Last Updated: 2024-05-20
+:: ================================================
 
-echo ================================================
-echo    Restaurant Management System (.NET 8.0)
-echo             Installation Wizard
-echo ================================================
-echo.
+:: Initialize variables
+set APP_NAME=FastFoodManagement
+set APP_VERSION=3.0
+set INSTALL_DATE=%date% %time%
 
 :: Check for Administrator privileges
 NET SESSION >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
-    echo [!] This script must be run as Administrator
-    echo [!] Please right-click the file and select "Run as Administrator"
+    echo [!] يجب تشغيل هذا السكربت كمسؤول
+    echo [!] الرجاء الضغط بزر الماوس الأيمن واختيار "تشغيل كمسؤول"
+    pause
+    exit /b
+)
+
+:: Display header
+echo ================================================
+echo    نظام إدارة المطعم - إصدار %APP_VERSION%
+echo    معالج التثبيت (%INSTALL_DATE%)
+echo ================================================
+echo.
+
+:: Check internet connection
+echo [1/7] التحقق من اتصال الإنترنت...
+ping -n 1 google.com >nul || (
+    echo [!] لا يوجد اتصال بالإنترنت
+    echo [!] هذا التثبيت يتطلب اتصالاً نشطاً
     pause
     exit /b
 )
 
 :: Define main paths
-set APP_NAME=FastFoodManagement
 set APP_PATH=C:\%APP_NAME%
 set DATA_PATH=%APP_PATH%\Data
 set LOGS_PATH=%APP_PATH%\Logs
@@ -29,151 +45,146 @@ set REPORTS_PATH=%APP_PATH%\Reports
 set RECEIPTS_PATH=%APP_PATH%\Receipts
 set TEMP_PATH=%APP_PATH%\Temp
 
-:: Step 1: Install .NET 8.0 SDK and Runtime
-echo.
-echo [1/6] Installing .NET 8.0...
-echo.
+:: Create log file
+if not exist "%LOGS_PATH%" mkdir "%LOGS_PATH%"
+echo %INSTALL_DATE% - بدء التثبيت >> "%LOGS_PATH%\install.log"
 
-:: Check if .NET 8.0 is already installed
-dotnet --list-runtimes | find "Microsoft.WindowsDesktop.App 8.0" >nul
-if %ERRORLEVEL% equ 0 (
-    echo [✓] .NET 8.0 Runtime is already installed
-) else (
-    echo [i] Downloading and installing .NET 8.0 Runtime...
-    
-    :: Create temporary folder for downloads
-    if not exist "%TEMP%\%APP_NAME%" mkdir "%TEMP%\%APP_NAME%"
-    
-    :: Download the installer
-    powershell -command "& {$ProgressPreference='SilentlyContinue'; Invoke-WebRequest -Uri 'https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-8.0.0-windows-x64-installer' -OutFile '%TEMP%\%APP_NAME%\dotnet-runtime-8.0.0-win-x64.exe'}"
-    
-    :: Run silently
-    echo [i] Installing, this may take a few minutes...
-    start /wait "" "%TEMP%\%APP_NAME%\dotnet-runtime-8.0.0-win-x64.exe" /install /quiet /norestart
-    
-    :: Verify installation
-    dotnet --list-runtimes | find "Microsoft.WindowsDesktop.App 8.0" >nul
-    if %ERRORLEVEL% equ 0 (
-        echo [✓] .NET 8.0 installed successfully
-    ) else (
-        echo [!] Failed to install .NET 8.0
-        echo [i] Please install .NET 8.0 manually from Microsoft website
-        echo [i] https://dotnet.microsoft.com/download/dotnet/8.0
-        pause
-        exit /b
-    )
-)
-
-:: Step 2: Install SQLite
-echo.
-echo [2/6] Installing SQLite...
-echo.
-
-:: Setup SQLite path
-set SQLITE_PATH=C:\sqlite3
-set SQLITE_EXE=%SQLITE_PATH%\sqlite3.exe
-
-:: Check if sqlite3.exe exists
-if exist "%SQLITE_EXE%" (
-    echo [✓] SQLite already exists at %SQLITE_PATH%
-) else (
-    echo [i] Downloading and installing SQLite...
-    
-    :: Create SQLite folder if it doesn't exist
-    if not exist "%SQLITE_PATH%" mkdir "%SQLITE_PATH%"
-    
-    :: Download SQLite
-    powershell -command "& {$ProgressPreference='SilentlyContinue'; Invoke-WebRequest -Uri 'https://www.sqlite.org/2023/sqlite-tools-win32-x86-3420000.zip' -OutFile '%TEMP%\%APP_NAME%\sqlite.zip'}"
-    
-    :: Extract the file
-    powershell -command "& {Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('%TEMP%\%APP_NAME%\sqlite.zip', '%TEMP%\%APP_NAME%\sqlite')}"
-    
-    :: Copy files to the required folder
-    copy "%TEMP%\%APP_NAME%\sqlite\sqlite-tools-win32-x86-3420000\sqlite3.exe" "%SQLITE_PATH%\" >nul
-    
-    :: Verify copy
-    if exist "%SQLITE_EXE%" (
-        echo [✓] SQLite installed successfully
-    ) else (
-        echo [!] Failed to install SQLite
-        echo [i] Please install SQLite manually from SQLite website
-        echo [i] https://www.sqlite.org/download.html
-        pause
-        exit /b
-    )
-)
-
-:: Add SQLite to PATH variable
-echo [i] Adding SQLite to system variables...
-
-:: Check if path is already added
-echo %PATH% | find /i "%SQLITE_PATH%" > nul
-if %ERRORLEVEL% equ 0 (
-    echo [✓] Path %SQLITE_PATH% is already added to PATH
-) else (
-    :: Add path to PATH permanently
-    setx PATH "%PATH%;%SQLITE_PATH%" /M
-    echo [✓] Path %SQLITE_PATH% added to PATH
-)
-
-:: Step 3: Install additional NuGet packages
-echo.
-echo [3/6] Installing additional NuGet packages...
-echo.
-
-:: Check for dotnet
-where dotnet >nul 2>&1
+:: Step 1: Check disk space
+echo [2/7] التحقق من مساحة القرص...
+fsutil volume diskfree %SYSTEMDRIVE% | find "of free bytes" >nul
 if %ERRORLEVEL% neq 0 (
-    echo [!] dotnet tool not found
-    echo [i] Please make sure .NET SDK is installed
+    echo [!] تعذر التحقق من مساحة القرص
+    echo [i] تأكد من وجود 2GB مساحة حرة على الأقل
+    echo %INSTALL_DATE% - خطأ في مساحة القرص >> "%LOGS_PATH%\install.log"
     pause
     exit /b
 )
 
-:: Create temporary project folder
+:: Step 2: Install .NET 8.0
+echo [3/7] تثبيت .NET 8.0 Runtime...
+echo %INSTALL_DATE% - تثبيت .NET 8.0 >> "%LOGS_PATH%\install.log"
+
+dotnet --list-runtimes | find "Microsoft.WindowsDesktop.App 8.0" >nul
+if %ERRORLEVEL% equ 0 (
+    echo [✓] .NET 8.0 مثبت مسبقاً
+    echo %INSTALL_DATE% - .NET 8.0 موجود مسبقاً >> "%LOGS_PATH%\install.log"
+) else (
+    echo [i] جاري تنزيل .NET 8.0...
+    
+    :: Create temporary folder
+    if not exist "%TEMP%\%APP_NAME%" mkdir "%TEMP%\%APP_NAME%"
+    
+    :: Download installer
+    set DOTNET_URL=https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-8.0.0-windows-x64-installer
+    powershell -command "& {$ProgressPreference='SilentlyContinue'; Invoke-WebRequest -Uri '%DOTNET_URL%' -OutFile '%TEMP%\%APP_NAME%\dotnet-runtime.exe'}"
+    
+    :: Install silently
+    echo [i] جاري التثبيت، قد يستغرق بضع دقائق...
+    start /wait "" "%TEMP%\%APP_NAME%\dotnet-runtime.exe" /install /quiet /norestart
+    
+    :: Verify installation
+    dotnet --list-runtimes | find "Microsoft.WindowsDesktop.App 8.0" >nul
+    if %ERRORLEVEL% equ 0 (
+        echo [✓] تم تثبيت .NET 8.0 بنجاح
+        echo %INSTALL_DATE% - تثبيت .NET 8.0 نجح >> "%LOGS_PATH%\install.log"
+    ) else (
+        echo [!] فشل تثبيت .NET 8.0
+        echo [i] الرجاء التثبيت يدوياً من موقع مايكروسوفت
+        echo %INSTALL_DATE% - فشل تثبيت .NET >> "%LOGS_PATH%\install.log"
+        pause
+        exit /b
+    )
+)
+
+:: Step 3: Install SQLite (latest version)
+echo [4/7] تثبيت SQLite...
+echo %INSTALL_DATE% - تثبيت SQLite >> "%LOGS_PATH%\install.log"
+
+set SQLITE_PATH=C:\sqlite3
+set SQLITE_EXE=%SQLITE_PATH%\sqlite3.exe
+set SQLITE_URL=https://www.sqlite.org/2023/sqlite-tools-win32-x86-3440200.zip
+
+if exist "%SQLITE_EXE%" (
+    echo [✓] SQLite موجود مسبقاً في %SQLITE_PATH%
+    echo %INSTALL_DATE% - SQLite موجود مسبقاً >> "%LOGS_PATH%\install.log"
+) else (
+    echo [i] جاري تنزيل SQLite...
+    
+    :: Create SQLite folder
+    if not exist "%SQLITE_PATH%" mkdir "%SQLITE_PATH%"
+    
+    :: Download and extract
+    powershell -command "& {$ProgressPreference='SilentlyContinue'; Invoke-WebRequest -Uri '%SQLITE_URL%' -OutFile '%TEMP%\%APP_NAME%\sqlite.zip'}"
+    powershell -command "& {Add-Type -AssemblyName System.IO.Compression.FileSystem; [System.IO.Compression.ZipFile]::ExtractToDirectory('%TEMP%\%APP_NAME%\sqlite.zip', '%TEMP%\%APP_NAME%\sqlite')}"
+    
+    :: Copy files
+    copy "%TEMP%\%APP_NAME%\sqlite\sqlite-tools-win32-x86-3440200\sqlite3.exe" "%SQLITE_PATH%\"
+    
+    :: Verify
+    if exist "%SQLITE_EXE%" (
+        echo [✓] تم تثبيت SQLite بنجاح
+        echo %INSTALL_DATE% - تثبيت SQLite نجح >> "%LOGS_PATH%\install.log"
+    ) else (
+        echo [!] فشل تثبيت SQLite
+        echo %INSTALL_DATE% - فشل تثبيت SQLite >> "%LOGS_PATH%\install.log"
+        pause
+        exit /b
+    )
+)
+
+:: Add SQLite to PATH
+echo [i] إضافة SQLite إلى متغيرات النظام...
+echo %PATH% | find /i "%SQLITE_PATH%" > nul
+if %ERRORLEVEL% equ 0 (
+    echo [✓] المسار %SQLITE_PATH% مضاف مسبقاً
+    echo %INSTALL_DATE% - مسار SQLite موجود في PATH >> "%LOGS_PATH%\install.log"
+) else (
+    setx PATH "%PATH%;%SQLITE_PATH%" /M
+    echo [✓] تم إضافة %SQLITE_PATH% إلى PATH
+    echo %INSTALL_DATE% - تم إضافة SQLite إلى PATH >> "%LOGS_PATH%\install.log"
+)
+
+:: Step 4: Install NuGet packages
+echo [5/7] تثبيت حزم NuGet المطلوبة...
+echo %INSTALL_DATE% - تثبيت حزم NuGet >> "%LOGS_PATH%\install.log"
+
 set TEMP_PROJECT=%TEMP%\%APP_NAME%\TempProject
 if not exist "%TEMP_PROJECT%" mkdir "%TEMP_PROJECT%"
 
-:: Create temporary project
 pushd "%TEMP_PROJECT%"
 dotnet new console -n TempProject
 cd TempProject
 
-:: Install required packages
-echo [i] Installing Microsoft.EntityFrameworkCore.Sqlite...
+:: Package installation with progress
+echo [i] جاري تثبيت الحزم...
+echo [i] █░░░░░░░░░░░░░░░░░ 5% (Microsoft.EntityFrameworkCore.Sqlite)
 dotnet add package Microsoft.EntityFrameworkCore.Sqlite --version 8.0.0 >nul
 
-echo [i] Installing Microsoft.EntityFrameworkCore.Tools...
-dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.0.0 >nul
-
-echo [i] Installing MaterialDesignThemes...
+echo [i] ████░░░░░░░░░░░░░░ 20% (MaterialDesignThemes)
 dotnet add package MaterialDesignThemes --version 4.9.0 >nul
 
-echo [i] Installing iTextSharp.LGPLv2.Core...
+echo [i] ███████░░░░░░░░░░░ 35% (iTextSharp.LGPLv2.Core)
 dotnet add package iTextSharp.LGPLv2.Core --version 3.4.3 >nul
 
-echo [i] Installing System.Drawing.Common...
-dotnet add package System.Drawing.Common --version 8.0.0 >nul
-
-echo [i] Installing Microsoft.Extensions.Logging...
+echo [i] █████████░░░░░░░░░ 50% (Microsoft.Extensions.Logging)
 dotnet add package Microsoft.Extensions.Logging --version 8.0.0 >nul
 
-echo [i] Installing Newtonsoft.Json...
+echo [i] ███████████░░░░░░░ 65% (Newtonsoft.Json)
 dotnet add package Newtonsoft.Json --version 13.0.3 >nul
 
-echo [✓] All NuGet packages installed successfully
+echo [i] █████████████░░░░░ 80% (System.Drawing.Common)
+dotnet add package System.Drawing.Common --version 8.0.0 >nul
 
-:: Return to original folder
+echo [✓] ██████████████████ 100% تم تثبيت جميع الحزم
+echo %INSTALL_DATE% - تم تثبيت جميع حزم NuGet >> "%LOGS_PATH%\install.log"
 popd
 
-:: Step 4: Create folder structure
-echo.
-echo [4/6] Creating folder structure...
-echo.
+:: Step 5: Create folder structure
+echo [6/7] إنشاء هيكل المجلدات...
+echo %INSTALL_DATE% - إنشاء مجلدات >> "%LOGS_PATH%\install.log"
 
-:: Create main folders
 if not exist "%APP_PATH%" (
-    echo [i] Creating main folders...
+    echo [i] جاري إنشاء الهيكل الرئيسي...
     mkdir "%APP_PATH%"
     mkdir "%DATA_PATH%"
     mkdir "%LOGS_PATH%"
@@ -182,27 +193,27 @@ if not exist "%APP_PATH%" (
     mkdir "%RECEIPTS_PATH%"
     mkdir "%TEMP_PATH%"
     
-    :: Set access permissions
-    echo [i] Setting access permissions...
+    :: Set permissions
     icacls "%APP_PATH%" /grant "Users:(OI)(CI)M" >nul
-    
-    echo [✓] Folder structure created successfully
+    echo [✓] تم إنشاء الهيكل بنجاح
+    echo %INSTALL_DATE% - تم إنشاء الهيكل >> "%LOGS_PATH%\install.log"
 ) else (
-    echo [✓] Folder structure already exists
+    echo [✓] الهيكل موجود مسبقاً
+    echo %INSTALL_DATE% - الهيكل موجود مسبقاً >> "%LOGS_PATH%\install.log"
 )
 
-:: Step 5: Create initial database
-echo.
-echo [5/6] Creating initial database...
-echo.
+:: Step 6: Initialize database
+echo [7/7] تهيئة قاعدة البيانات...
+echo %INSTALL_DATE% - تهيئة قاعدة البيانات >> "%LOGS_PATH%\install.log"
 
 set DB_FILE=%DATA_PATH%\restaurant.db
+set DB_BACKUP=%BACKUPS_PATH%\restaurant_initial.db
 
 if not exist "%DB_FILE%" (
-    echo [i] Creating new database...
+    echo [i] جاري إنشاء قاعدة البيانات...
     
-    :: Create SQL file for initial structure
-    echo -- Creating initial database tables > "%TEMP%\%APP_NAME%\init_db.sql"
+    :: Create SQL initialization script
+    echo BEGIN TRANSACTION; > "%TEMP%\%APP_NAME%\init_db.sql"
     echo CREATE TABLE Categories (CategoryId INTEGER PRIMARY KEY, Name TEXT NOT NULL, Description TEXT); >> "%TEMP%\%APP_NAME%\init_db.sql"
     echo CREATE TABLE Products (ProductId INTEGER PRIMARY KEY, Name TEXT NOT NULL, Description TEXT, Price REAL NOT NULL, CategoryId INTEGER, IsAvailable INTEGER, Image TEXT, FOREIGN KEY(CategoryId) REFERENCES Categories(CategoryId)); >> "%TEMP%\%APP_NAME%\init_db.sql"
     echo CREATE TABLE Orders (OrderId INTEGER PRIMARY KEY, OrderDate TEXT NOT NULL, CustomerName TEXT, TotalAmount REAL, IsPaid INTEGER, PaymentMethod TEXT, OrderStatus TEXT); >> "%TEMP%\%APP_NAME%\init_db.sql"
@@ -210,85 +221,74 @@ if not exist "%DB_FILE%" (
     echo CREATE TABLE Users (UserId INTEGER PRIMARY KEY, Username TEXT NOT NULL UNIQUE, PasswordHash TEXT NOT NULL, FullName TEXT, Role TEXT, IsActive INTEGER); >> "%TEMP%\%APP_NAME%\init_db.sql"
     echo CREATE TABLE AppSettings (SettingId INTEGER PRIMARY KEY, SettingKey TEXT NOT NULL UNIQUE, SettingValue TEXT, Description TEXT); >> "%TEMP%\%APP_NAME%\init_db.sql"
     
-    :: Add initial data
-    echo -- Adding initial data >> "%TEMP%\%APP_NAME%\init_db.sql"
-    echo INSERT INTO Categories (Name, Description) VALUES ('Main Dishes', 'Main course dishes'); >> "%TEMP%\%APP_NAME%\init_db.sql"
-    echo INSERT INTO Categories (Name, Description) VALUES ('Beverages', 'Cold and hot drinks'); >> "%TEMP%\%APP_NAME%\init_db.sql"
-    echo INSERT INTO Categories (Name, Description) VALUES ('Desserts', 'Sweets and desserts'); >> "%TEMP%\%APP_NAME%\init_db.sql"
-    echo INSERT INTO Products (Name, Description, Price, CategoryId, IsAvailable) VALUES ('Beef Burger', 'Beef burger with cheese and vegetables', 25.00, 1, 1); >> "%TEMP%\%APP_NAME%\init_db.sql"
-    echo INSERT INTO Products (Name, Description, Price, CategoryId, IsAvailable) VALUES ('Chicken Burger', 'Chicken burger with special sauce', 22.00, 1, 1); >> "%TEMP%\%APP_NAME%\init_db.sql"
-    echo INSERT INTO Products (Name, Description, Price, CategoryId, IsAvailable) VALUES ('Cola', 'Cold carbonated drink', 5.00, 2, 1); >> "%TEMP%\%APP_NAME%\init_db.sql"
-    echo INSERT INTO Users (Username, PasswordHash, FullName, Role, IsActive) VALUES ('admin', '$2a$11$K3g6XpVzmdBp0AfZ9GWbZeRJJWrm/QbiQTfHX5XhwJECZ6FbLIHSa', 'System Administrator', 'Admin', 1); >> "%TEMP%\%APP_NAME%\init_db.sql"
-    echo INSERT INTO AppSettings (SettingKey, SettingValue, Description) VALUES ('RestaurantName', 'Al-Waseet Restaurant', 'Restaurant name'); >> "%TEMP%\%APP_NAME%\init_db.sql"
-    echo INSERT INTO AppSettings (SettingKey, SettingValue, Description) VALUES ('TaxRate', '15', 'Tax rate percentage'); >> "%TEMP%\%APP_NAME%\init_db.sql"
+    :: Add initial data with secure password hash
+    echo INSERT INTO Categories (Name, Description) VALUES ('الوجبات الرئيسية', 'الوجبات الأساسية'); >> "%TEMP%\%APP_NAME%\init_db.sql"
+    echo INSERT INTO Categories (Name, Description) VALUES ('المشروبات', 'مشروبات ساخنة وباردة'); >> "%TEMP%\%APP_NAME%\init_db.sql"
+    echo INSERT INTO Products (Name, Description, Price, CategoryId, IsAvailable) VALUES ('برجر لحم', 'برجر لحم مع الجبن والخضار', 25.00, 1, 1); >> "%TEMP%\%APP_NAME%\init_db.sql"
+    echo INSERT INTO Users (Username, PasswordHash, FullName, Role, IsActive) VALUES ('admin', '$2a$11$K3g6XpVzmdBp0AfZ9GWbZeRJJWrm/QbiQTfHX5XhwJECZ6FbLIHSa', 'مدير النظام', 'Admin', 1); >> "%TEMP%\%APP_NAME%\init_db.sql"
+    echo COMMIT; >> "%TEMP%\%APP_NAME%\init_db.sql"
     
-    :: Create database and execute commands
+    :: Create database
     "%SQLITE_EXE%" "%DB_FILE%" < "%TEMP%\%APP_NAME%\init_db.sql"
     
-    :: Verify database creation
+    :: Create backup
     if exist "%DB_FILE%" (
-        echo [✓] Initial database created successfully
+        copy "%DB_FILE%" "%DB_BACKUP%" >nul
+        echo [✓] تم إنشاء قاعدة البيانات والنسخة الاحتياطية
+        echo %INSTALL_DATE% - تم إنشاء قاعدة البيانات >> "%LOGS_PATH%\install.log"
     ) else (
-        echo [!] Failed to create database
+        echo [!] فشل إنشاء قاعدة البيانات
+        echo %INSTALL_DATE% - فشل إنشاء قاعدة البيانات >> "%LOGS_PATH%\install.log"
         pause
         exit /b
     )
 ) else (
-    echo [✓] Database already exists
+    echo [✓] قاعدة البيانات موجودة مسبقاً
+    echo %INSTALL_DATE% - قاعدة البيانات موجودة مسبقاً >> "%LOGS_PATH%\install.log"
 )
 
-:: Step 6: Create desktop shortcut
-echo.
-echo [6/6] Creating desktop shortcut...
-echo.
-
+:: Create desktop shortcut
+echo [i] إنشاء اختصار على سطح المكتب...
 set SHORTCUT_PATH=%USERPROFILE%\Desktop\%APP_NAME%.lnk
 set TARGET_PATH=%APP_PATH%\%APP_NAME%.exe
 
-:: Create VBScript file to create shortcut
 echo Set oWS = WScript.CreateObject("WScript.Shell") > "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
 echo sLinkFile = "%SHORTCUT_PATH%" >> "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
 echo Set oLink = oWS.CreateShortcut(sLinkFile) >> "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
 echo oLink.TargetPath = "%TARGET_PATH%" >> "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
 echo oLink.WorkingDirectory = "%APP_PATH%" >> "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
-echo oLink.Description = "Restaurant Management System" >> "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
-echo oLink.IconLocation = "%APP_PATH%\icon.ico" >> "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
+echo oLink.Description = "نظام إدارة المطعم - إصدار %APP_VERSION%" >> "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
 echo oLink.Save >> "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
 
-:: Execute the file
 cscript //nologo "%TEMP%\%APP_NAME%\CreateShortcut.vbs"
+echo [✓] تم إنشاء الاختصار
+echo %INSTALL_DATE% - تم إنشاء اختصار سطح المكتب >> "%LOGS_PATH%\install.log"
 
-echo [✓] Desktop shortcut created
-
-:: Clean up temporary files
-echo.
-echo [i] Cleaning up temporary files...
+:: Cleanup
+echo [i] جاري التنظيف...
 rmdir /s /q "%TEMP_PROJECT%" >nul 2>&1
-del "%TEMP%\%APP_NAME%\dotnet-runtime-8.0.0-win-x64.exe" >nul 2>&1
-del "%TEMP%\%APP_NAME%\sqlite.zip" >nul 2>&1
-del "%TEMP%\%APP_NAME%\init_db.sql" >nul 2>&1
-del "%TEMP%\%APP_NAME%\CreateShortcut.vbs" >nul 2>&1
-rmdir /s /q "%TEMP%\%APP_NAME%\sqlite" >nul 2>&1
+del "%TEMP%\%APP_NAME%\*.*" >nul 2>&1
+rmdir /s /q "%TEMP%\%APP_NAME%" >nul 2>&1
 
-:: Display completion message
+:: Final message
 echo.
 echo ================================================
 echo *                                              *
-echo *      Installation completed successfully!    *
+echo *      تم التثبيت بنجاح! - الإصدار %APP_VERSION%      *
 echo *                                              *
-echo *  - .NET 8.0 Runtime installed               *
-echo *  - SQLite installed and added to PATH       *
-echo *  - Required NuGet packages installed        *
-echo *  - Folder structure created                 *
-echo *  - Initial database created                 *
-echo *  - Desktop shortcut created                 *
+echo *  - تم تثبيت .NET 8.0 Runtime                *
+echo *  - تم تثبيت SQLite وإضافته إلى PATH         *
+echo *  - تم تثبيت جميع الحزم المطلوبة             *
+echo *  - تم إنشاء هيكل المجلدات                   *
+echo *  - تم تهيئة قاعدة البيانات                  *
+echo *  - تم إنشاء اختصار على سطح المكتب          *
 echo *                                              *
-echo *  You can now run the Restaurant Management  *
-echo *  System                                     *
+echo *  معلومات الدخول الافتراضية:                 *
+echo *  اسم المستخدم: admin                        *
+echo *  كلمة المرور: Admin@2024                    *
 echo *                                              *
-echo *  Note: Default admin credentials are:       *
-echo *  Username: admin                            *
-echo *  Password: Admin123!                        *
+echo *  تم إنشاء سجل التثبيت في:                   *
+echo *  %LOGS_PATH%\install.log                    *
 echo *                                              *
 echo ================================================
 echo.
