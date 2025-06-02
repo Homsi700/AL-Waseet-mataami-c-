@@ -7,6 +7,7 @@ using System.Windows.Input;
 using FastFoodManagement.Common.Commands;
 using FastFoodManagement.Settings.Services;
 using Microsoft.Win32;
+using WinForms = System.Windows.Forms;
 
 namespace FastFoodManagement.Settings.ViewModels
 {
@@ -216,13 +217,13 @@ namespace FastFoodManagement.Settings.ViewModels
 
         private void BrowseBackupPath()
         {
-            var dialog = new System.Windows.Forms.FolderBrowserDialog
+            var dialog = new WinForms.FolderBrowserDialog
             {
                 Description = "Select Backup Directory",
                 ShowNewFolderButton = true
             };
             
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (dialog.ShowDialog() == WinForms.DialogResult.OK)
             {
                 BackupPath = dialog.SelectedPath;
             }

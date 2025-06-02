@@ -7,7 +7,8 @@ using System.Windows.Xps;
 using System.Windows.Xps.Packaging;
 using System.IO;
 using System.IO.Packaging;
-using System.Printing;
+// System.Printing is included via Microsoft.WindowsDesktop.App framework reference
+// using System.Printing;
 using FastFoodManagement.Data.Models;
 
 namespace FastFoodManagement.Services
@@ -19,7 +20,7 @@ namespace FastFoodManagement.Services
             try
             {
                 // Create a PrintDialog
-                PrintDialog printDialog = new PrintDialog();
+                System.Windows.Controls.PrintDialog printDialog = new System.Windows.Controls.PrintDialog();
                 
                 if (printDialog.ShowDialog() == true)
                 {
@@ -112,7 +113,7 @@ namespace FastFoodManagement.Services
         {
             try
             {
-                PrintDialog printDialog = new PrintDialog();
+                System.Windows.Controls.PrintDialog printDialog = new System.Windows.Controls.PrintDialog();
                 
                 if (printDialog.ShowDialog() == true)
                 {

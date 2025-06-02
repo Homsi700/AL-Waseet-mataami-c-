@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Input;
 using FastFoodManagement.Common.Commands;
 using FastFoodManagement.Data;
+using WinForms = System.Windows.Forms;
 
 namespace FastFoodManagement.Settings.ViewModels
 {
@@ -139,7 +140,7 @@ namespace FastFoodManagement.Settings.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"خطأ في تحميل إحصائيات قاعدة البيانات: {ex.Message}", 
+                System.Windows.MessageBox.Show($"خطأ في تحميل إحصائيات قاعدة البيانات: {ex.Message}", 
                     "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -211,20 +212,20 @@ namespace FastFoodManagement.Settings.ViewModels
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"خطأ في تحميل سجل النسخ الاحتياطي: {ex.Message}", 
+                System.Windows.MessageBox.Show($"خطأ في تحميل سجل النسخ الاحتياطي: {ex.Message}", 
                     "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private void BrowseBackupPath()
         {
-            var dialog = new System.Windows.Forms.FolderBrowserDialog
+            var dialog = new WinForms.FolderBrowserDialog
             {
                 Description = "اختر مجلد النسخ الاحتياطي",
                 ShowNewFolderButton = true
             };
             
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (dialog.ShowDialog() == WinForms.DialogResult.OK)
             {
                 BackupPath = dialog.SelectedPath;
             }
@@ -246,7 +247,7 @@ namespace FastFoodManagement.Settings.ViewModels
                 
                 IsBusy = false;
                 
-                MessageBox.Show($"تم إنشاء النسخة الاحتياطية بنجاح في:\n{fullPath}", 
+                System.Windows.MessageBox.Show($"تم إنشاء النسخة الاحتياطية بنجاح في:\n{fullPath}", 
                     "اكتمل النسخ الاحتياطي", MessageBoxButton.OK, MessageBoxImage.Information);
                 
                 // Refresh UI
@@ -256,7 +257,7 @@ namespace FastFoodManagement.Settings.ViewModels
             catch (Exception ex)
             {
                 IsBusy = false;
-                MessageBox.Show($"خطأ في إنشاء النسخة الاحتياطية: {ex.Message}", 
+                System.Windows.MessageBox.Show($"خطأ في إنشاء النسخة الاحتياطية: {ex.Message}", 
                     "خطأ في النسخ الاحتياطي", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -282,7 +283,7 @@ namespace FastFoodManagement.Settings.ViewModels
                 }
             }
             
-            var result = MessageBox.Show(
+            var result = System.Windows.MessageBox.Show(
                 "تحذير: ستؤدي استعادة قاعدة البيانات إلى استبدال جميع البيانات الحالية. هل أنت متأكد من أنك تريد المتابعة؟",
                 "تأكيد الاستعادة", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 
@@ -298,7 +299,7 @@ namespace FastFoodManagement.Settings.ViewModels
                     
                     if (success)
                     {
-                        MessageBox.Show("تمت استعادة قاعدة البيانات بنجاح. سيتم إعادة تشغيل التطبيق الآن.",
+                        System.Windows.MessageBox.Show("تمت استعادة قاعدة البيانات بنجاح. سيتم إعادة تشغيل التطبيق الآن.",
                             "اكتملت الاستعادة", MessageBoxButton.OK, MessageBoxImage.Information);
                             
                         // In a real application, you would restart the application here
@@ -308,14 +309,14 @@ namespace FastFoodManagement.Settings.ViewModels
                     }
                     else
                     {
-                        MessageBox.Show("فشلت استعادة قاعدة البيانات. يرجى التحقق من ملف النسخة الاحتياطية والمحاولة مرة أخرى.",
+                        System.Windows.MessageBox.Show("فشلت استعادة قاعدة البيانات. يرجى التحقق من ملف النسخة الاحتياطية والمحاولة مرة أخرى.",
                             "فشل الاستعادة", MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
                 catch (Exception ex)
                 {
                     IsBusy = false;
-                    MessageBox.Show($"خطأ في استعادة قاعدة البيانات: {ex.Message}",
+                    System.Windows.MessageBox.Show($"خطأ في استعادة قاعدة البيانات: {ex.Message}",
                         "خطأ في الاستعادة", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -326,7 +327,7 @@ namespace FastFoodManagement.Settings.ViewModels
             if (string.IsNullOrEmpty(backupPath))
                 return;
                 
-            var result = MessageBox.Show(
+            var result = System.Windows.MessageBox.Show(
                 "هل أنت متأكد من أنك تريد حذف هذه النسخة الاحتياطية؟",
                 "تأكيد الحذف", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 
@@ -350,7 +351,7 @@ namespace FastFoodManagement.Settings.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"خطأ في حذف النسخة الاحتياطية: {ex.Message}",
+                    System.Windows.MessageBox.Show($"خطأ في حذف النسخة الاحتياطية: {ex.Message}",
                         "خطأ في الحذف", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -369,7 +370,7 @@ namespace FastFoodManagement.Settings.ViewModels
                 
                 string status = stats.IntegrityCheck == "ok" ? "جيدة" : "تحتاج إلى إصلاح";
                 
-                MessageBox.Show($"اكتمل فحص سلامة قاعدة البيانات.\n\nالنتيجة: {status}",
+                System.Windows.MessageBox.Show($"اكتمل فحص سلامة قاعدة البيانات.\n\nالنتيجة: {status}",
                     "نتائج فحص السلامة", MessageBoxButton.OK, 
                     stats.IntegrityCheck == "ok" ? MessageBoxImage.Information : MessageBoxImage.Warning);
                     

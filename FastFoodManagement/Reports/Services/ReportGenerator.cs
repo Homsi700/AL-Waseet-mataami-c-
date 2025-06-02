@@ -7,6 +7,7 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using FastFoodManagement.Reports.ViewModels;
 using Microsoft.Win32;
+using WinForms = System.Windows.Forms;
 
 namespace FastFoodManagement.Reports.Services
 {
@@ -354,7 +355,7 @@ namespace FastFoodManagement.Reports.Services
                 // In a real application, this would use a library like EPPlus or NPOI
                 // to create an actual Excel file. For this example, we'll just create a CSV.
                 
-                SaveFileDialog saveFileDialog = new SaveFileDialog
+                Microsoft.Win32.SaveFileDialog saveFileDialog = new Microsoft.Win32.SaveFileDialog
                 {
                     Filter = "CSV files (*.csv)|*.csv",
                     Title = "Export Report",
