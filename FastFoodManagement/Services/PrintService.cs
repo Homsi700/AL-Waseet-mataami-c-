@@ -3,7 +3,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Windows.Printing;
+using System.Windows.Xps;
+using System.Windows.Xps.Packaging;
+using System.IO;
+using System.IO.Packaging;
+using System.Printing;
 using FastFoodManagement.Data.Models;
 
 namespace FastFoodManagement.Services

@@ -120,27 +120,6 @@ namespace FastFoodManagement.Data
         }
     }
 
-    // User model for authentication
-    public class User
-    {
-        public int UserId { get; set; }
-        public string Username { get; set; }
-        public string PasswordHash { get; set; }
-        public string FullName { get; set; }
-        public string Email { get; set; }
-        public string Role { get; set; }
-        public bool IsActive { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime? LastLoginDate { get; set; }
-    }
-    
-    // Application settings model
-    public class AppSetting
-    {
-        public int Id { get; set; }
-        public string SettingKey { get; set; }
-        public string SettingValue { get; set; }
-        public string SettingGroup { get; set; }
-        public string Description { get; set; }
-    }
+    // User and AppSetting models are now defined in separate files
+    // in the FastFoodManagement.Data.Models namespace
 }
