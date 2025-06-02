@@ -4,20 +4,12 @@ echo تشغيل نظام إدارة المطعم
 echo ===================================================
 
 echo.
-echo بناء المشروع...
+echo بناء وتشغيل المشروع...
 cd FastFoodManagement
-dotnet build
-if %ERRORLEVEL% NEQ 0 (
-    echo فشل في بناء المشروع.
-    pause
-    exit /b 1
-)
-
-echo.
-echo تشغيل التطبيق...
-dotnet run
+dotnet run --no-build
 if %ERRORLEVEL% NEQ 0 (
     echo فشل في تشغيل التطبيق.
+    echo يمكنك محاولة بناء المشروع أولاً باستخدام: dotnet build
     pause
     exit /b 1
 )
