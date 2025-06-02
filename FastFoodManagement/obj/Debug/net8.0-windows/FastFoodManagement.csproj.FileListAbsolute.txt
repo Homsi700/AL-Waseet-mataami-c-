@@ -10,3 +10,5 @@ C:\test\AL-Waseet-mataami-c#\FastFoodManagement\obj\Debug\net8.0-windows\FastFoo
 C:\test\AL-Waseet-mataami-c#\FastFoodManagement\obj\Debug\net8.0-windows\FastFoodManagement_MarkupCompile.lref
 C:\test\AL-Waseet-mataami-c#\FastFoodManagement\obj\Debug\net8.0-windows\POS\Views\POSView.g.cs
 C:\test\AL-Waseet-mataami-c#\FastFoodManagement\obj\Debug\net8.0-windows\Views\CategoriesView.g.cs
+C:\test\AL-Waseet-mataami-c#\FastFoodManagement\obj\Debug\net8.0-windows\FastFoodManagement.csproj.AssemblyReference.cache
+C:\test\AL-Waseet-mataami-c#\FastFoodManagement\obj\Debug\net8.0-windows\Themes\DefaultTheme.baml

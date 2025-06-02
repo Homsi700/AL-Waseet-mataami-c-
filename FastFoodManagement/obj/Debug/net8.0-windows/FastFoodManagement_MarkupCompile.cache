@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
 C:\test\AL-Waseet-mataami-c#\FastFoodManagement\App.xaml
-81840463030
+9-1790326904
 
-27436216707
-198-537775612
-Expenses\Views\ExpenseEntryView.xaml;POS\Views\POSView.xaml;Reports\Views\SalesReportView.xaml;Settings\Views\DatabaseDashboardView.xaml;Settings\Views\GeneralSettingsView.xaml;Views\CategoriesView.xaml;Views\MainWindow.xaml;Views\ReportsView.xaml;
+28-1933014414
+21633110565
+Expenses\Views\ExpenseEntryView.xaml;POS\Views\POSView.xaml;Reports\Views\SalesReportView.xaml;Settings\Views\DatabaseDashboardView.xaml;Settings\Views\GeneralSettingsView.xaml;Themes\DefaultTheme.xaml;Views\CategoriesView.xaml;Views\MainWindow.xaml;Views\ReportsView.xaml;
 
 True
 
