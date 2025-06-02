@@ -1,15 +1,15 @@
 @echo off
 echo ===================================================
-echo Running Restaurant Management System
+echo Running Restaurant Management System (No Build)
 echo ===================================================
 
 echo.
-echo Building and running the project...
+echo Running the application...
 cd FastFoodManagement
 dotnet run --no-build
 if %ERRORLEVEL% NEQ 0 (
     echo Failed to run the application.
-    echo You can try building the project first using: dotnet build
+    echo Make sure you have built the project first using build.bat
     pause
     exit /b 1
 )

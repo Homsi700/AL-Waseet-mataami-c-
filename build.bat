@@ -1,19 +1,19 @@
 @echo off
 echo ===================================================
-echo بناء نظام إدارة المطعم
+echo Building Restaurant Management System
 echo ===================================================
 
 echo.
-echo بناء المشروع...
+echo Building the project...
 cd FastFoodManagement
 dotnet build
 if %ERRORLEVEL% NEQ 0 (
-    echo فشل في بناء المشروع.
+    echo Failed to build the project.
     pause
     exit /b 1
 )
 
 echo.
-echo تم بناء المشروع بنجاح!
+echo Project built successfully!
 echo.
 pause

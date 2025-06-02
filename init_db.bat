@@ -1,41 +1,41 @@
 @echo off
 echo ===================================================
-echo تهيئة قاعدة بيانات نظام إدارة المطعم
+echo Initializing Restaurant Management System Database
 echo ===================================================
 
 echo.
-echo التحقق من وجود أدوات Entity Framework...
+echo Checking for Entity Framework tools...
 dotnet tool list --global | findstr "dotnet-ef"
 if %ERRORLEVEL% NEQ 0 (
-    echo تثبيت أدوات Entity Framework Core...
+    echo Installing Entity Framework Core tools...
     dotnet tool install --global dotnet-ef
     if %ERRORLEVEL% NEQ 0 (
-        echo فشل في تثبيت أدوات Entity Framework Core.
+        echo Failed to install Entity Framework Core tools.
         pause
         exit /b 1
     )
 )
 
 echo.
-echo إنشاء هجرات قاعدة البيانات...
+echo Creating database migrations...
 cd FastFoodManagement
 dotnet ef migrations add InitialCreate
 if %ERRORLEVEL% NEQ 0 (
-    echo فشل في إنشاء هجرات قاعدة البيانات.
+    echo Failed to create database migrations.
     pause
     exit /b 1
 )
 
 echo.
-echo تطبيق الهجرات على قاعدة البيانات...
+echo Applying migrations to database...
 dotnet ef database update
 if %ERRORLEVEL% NEQ 0 (
-    echo فشل في تطبيق الهجرات على قاعدة البيانات.
+    echo Failed to apply migrations to database.
     pause
     exit /b 1
 )
 
 echo.
-echo تم تهيئة قاعدة البيانات بنجاح!
+echo Database initialized successfully!
 echo.
 pause

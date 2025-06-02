@@ -1,49 +1,49 @@
 @echo off
 echo ===================================================
-echo تثبيت متطلبات نظام إدارة المطعم
+echo Installing Restaurant Management System Requirements
 echo ===================================================
 
 echo.
-echo التحقق من وجود .NET SDK...
+echo Checking for .NET SDK...
 where dotnet >nul 2>nul
 if %ERRORLEVEL% NEQ 0 (
-    echo .NET SDK غير مثبت. يرجى تثبيت .NET 8.0 SDK من الموقع الرسمي:
+    echo .NET SDK is not installed. Please install .NET 8.0 SDK from the official website:
     echo https://dotnet.microsoft.com/download/dotnet/8.0
     echo.
-    echo بعد التثبيت، قم بإعادة تشغيل هذا الملف.
+    echo After installation, run this file again.
     pause
     exit /b 1
 )
 
-echo .NET SDK موجود. التحقق من الإصدار...
+echo .NET SDK found. Checking version...
 dotnet --version
 echo.
 
-echo تثبيت حزم NuGet المطلوبة...
+echo Installing required NuGet packages...
 cd FastFoodManagement
 dotnet restore
 if %ERRORLEVEL% NEQ 0 (
-    echo فشل في تثبيت حزم NuGet.
+    echo Failed to install NuGet packages.
     pause
     exit /b 1
 )
 
 echo.
-echo إنشاء مجلد قاعدة البيانات...
+echo Creating database folder...
 mkdir FastFoodDB 2>nul
 
 echo.
-echo تهيئة قاعدة البيانات...
+echo Initializing database...
 dotnet ef database update
 if %ERRORLEVEL% NEQ 0 (
-    echo ملاحظة: قد تحتاج إلى تثبيت أدوات Entity Framework Core:
+    echo Note: You may need to install Entity Framework Core tools:
     echo dotnet tool install --global dotnet-ef
     echo.
-    echo ثم قم بتشغيل: dotnet ef database update
+    echo Then run: dotnet ef database update
 )
 
 echo.
-echo تم الانتهاء من التثبيت بنجاح!
-echo يمكنك الآن تشغيل المشروع باستخدام ملف run.bat
+echo Installation completed successfully!
+echo You can now run the project using run.bat
 echo.
 pause
